@@ -1,4 +1,5 @@
 import 'package:choices/firebase_options.dart';
+import 'package:choices/login_builder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -51,76 +52,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  User? _user;
-  UserCredential? _userCredential;
-
-  @override
-  void initState() {
-    _user = FirebaseAuth.instance.currentUser;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform),
       builder: (context, snapshot) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextField(
-                  autofocus: true,
-                  controller: emailController,
-                ),
-                TextField(
-                  autofocus: true,
-                  controller: passwordController,
-                ),
-                ElevatedButton(
-                  onPressed: _getToken,
-                  child: Text("getToken"),
-                ),
-              ],
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _login,
-            tooltip: 'Increment',
-            child: const Icon(Icons.add),
-          ),
-        );
+        if (snapshot.hasError) {
+          print(snapshot.error);
+        }
+        if (snapshot.connectionState == ConnectionState.done) {
+          return const LoginBuilder();
+        }
+        return const CircularProgressIndicator.adaptive();
       },
     );
-  }
-
-  void _login() {
-    FirebaseAuth.instance
-        .signInWithEmailAndPassword(
-      email: emailController.text,
-      password: passwordController.text,
-    )
-        .catchError((error) {
-      print(error);
-    }).then((value) {
-      setState(() {
-        print(value);
-        _userCredential = value;
-        _user = _userCredential?.user;
-      });
-    });
-  }
-
-  void _getToken() {
-    if (_user != null) {
-      _user?.getIdToken().then((value) => print(value));
-    }
   }
 }
