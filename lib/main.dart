@@ -56,7 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform),
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           print(snapshot.error);
