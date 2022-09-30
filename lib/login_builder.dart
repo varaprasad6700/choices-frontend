@@ -1,5 +1,7 @@
+import 'package:choices/landing_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginBuilder extends StatefulWidget {
   const LoginBuilder({Key? key}) : super(key: key);
@@ -12,7 +14,6 @@ class _LoginBuilderState extends State<LoginBuilder> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   User? _user;
-  UserCredential? _userCredential;
 
   @override
   void initState() {
@@ -22,57 +23,82 @@ class _LoginBuilderState extends State<LoginBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              autofocus: true,
-              controller: emailController,
+    return _user == null
+        ? Scaffold(
+            appBar: AppBar(
+              title: const Text('Login'),
+              centerTitle: true,
             ),
-            TextField(
-              autofocus: true,
-              controller: passwordController,
+            body: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 30.0,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextField(
+                      autofocus: true,
+                      controller: emailController,
+                    ),
+                    TextField(
+                      autofocus: true,
+                      controller: passwordController,
+                    ),
+                    ElevatedButton(
+                      onPressed: _googleLogin,
+                      child: const Text("sign in with google"),
+                    )
+                  ],
+                ),
+              ),
             ),
-            ElevatedButton(
-              onPressed: _getToken,
-              child: const Text("getToken"),
+            floatingActionButton: FloatingActionButton(
+              onPressed: _login,
+              tooltip: 'Login',
+              child: const Icon(Icons.login),
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _login,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
+          )
+        : const LandingPage();
   }
 
   void _login() {
     FirebaseAuth.instance
         .signInWithEmailAndPassword(
-      email: emailController.text,
-      password: passwordController.text,
-    )
-        .catchError((error) {
-      print(error);
-    }).then((value) {
+          email: emailController.text,
+          password: passwordController.text,
+        )
+        .catchError((error) {})
+        .then((value) {
       setState(() {
-        print(value);
-        _userCredential = value;
-        _user = _userCredential?.user;
+        _user = value.user;
       });
     });
   }
 
-  void _getToken() {
-    if (_user != null) {
-      _user?.getIdToken().then((value) => print(value));
-    }
+  void _googleLogin() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn(
+            clientId: "966555663103-m8ch0r60hphpdg3skphnmfu1jk55o8sg")
+        .signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    await FirebaseAuth.instance
+        .signInWithCredential(credential)
+        .catchError((error) {})
+        .then((value) {
+      setState(() {
+        _user = value.user;
+      });
+    });
   }
 }
