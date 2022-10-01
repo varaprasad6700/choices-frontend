@@ -1,4 +1,5 @@
-import 'package:choices/landing_page.dart';
+import 'package:choices/LandingPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -13,11 +14,15 @@ class LoginBuilder extends StatefulWidget {
 class _LoginBuilderState extends State<LoginBuilder> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  late FirebaseAuth auth;
+  late FirebaseFirestore db;
   User? _user;
 
   @override
   void initState() {
-    _user = FirebaseAuth.instance.currentUser;
+    auth = FirebaseAuth.instance;
+    db = FirebaseFirestore.instance;
+    _user = auth.currentUser;
     super.initState();
   }
 
@@ -59,7 +64,7 @@ class _LoginBuilderState extends State<LoginBuilder> {
               child: const Icon(Icons.login),
             ),
           )
-        : const LandingPage();
+        : LandingPage();
   }
 
   void _login() {

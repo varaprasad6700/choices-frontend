@@ -1,7 +1,8 @@
 import 'package:choices/firebase_options.dart';
-import 'package:choices/login_builder.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
+import 'AuthGate.dart';
 
 void main() {
   runApp(const MyApp());
@@ -62,9 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
           print(snapshot.error);
         }
         if (snapshot.connectionState == ConnectionState.done) {
-          return const LoginBuilder();
+          return const AuthGate();
         }
-        return const CircularProgressIndicator.adaptive();
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
       },
     );
   }
