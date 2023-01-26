@@ -2,7 +2,7 @@ import 'package:choices/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'AuthGate.dart';
+import 'auth_gate.dart';
 
 void main() {
   runApp(const MyApp());

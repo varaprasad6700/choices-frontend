@@ -5,8 +5,8 @@ class UserModel {
   late final String uid;
   late final String displayName;
   late final String email;
-  late final String phoneNumber;
-  late final String photoURL;
+  late final String? phoneNumber;
+  late final String? photoURL;
 
   UserModel({
     required this.uid,
@@ -21,8 +21,8 @@ class UserModel {
       uid: user.uid,
       displayName: user.displayName!,
       email: user.email!,
-      phoneNumber: user.phoneNumber!,
-      photoURL: user.photoURL!,
+      phoneNumber: user.phoneNumber,
+      photoURL: user.photoURL,
     );
   }
 
